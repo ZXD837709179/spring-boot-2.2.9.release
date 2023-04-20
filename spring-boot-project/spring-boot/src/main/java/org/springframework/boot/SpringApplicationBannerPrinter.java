@@ -67,7 +67,11 @@ class SpringApplicationBannerPrinter {
 	}
 
 	Banner print(Environment environment, Class<?> sourceClass, PrintStream out) {
+		//从当前环境中获取banner资源
+		//banner可以是图片或者txt文本格式，默认自定义资源名字是banner.txt，位于resources目录下
+		//一般是没有自定义banner资源的，此时采用SpringBootBanner，也就是默认的banner配置
 		Banner banner = getBanner(environment);
+		//打印banner图
 		banner.printBanner(environment, sourceClass, out);
 		return new PrintedBanner(banner, sourceClass);
 	}

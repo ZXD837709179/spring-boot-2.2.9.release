@@ -460,14 +460,15 @@ public class SpringApplication {
 
 	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
 													   ApplicationArguments applicationArguments) {
-		// Create and configure the environment 创建并配置相应的环境
+		// Create and configure the environment 创建并配置相应的环境 一般都是StandardServletEnvironment类型
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
-		//根据用户配置，配置environment系统环境
+		//根据用户配置，配置environment系统环境，主要配置属性源和激活的环境，将来自外部的配置源放在属性源集合的头部
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
 		ConfigurationPropertySources.attach(environment);
-		//启动相应的监听器 其中一个重要的监听器是ConfigFileApplicationListener 就是加载项目配置文件的监听器
+		//环境准备完毕之后,启动相应的监听器,向所有的ApplicationListener发出ApplicationEnvironmentPreparedEvent事件,其中一个重要的监听器是ConfigFileApplicationListener 就是加载项目配置文件的监听器；
 		listeners.environmentPrepared(environment);
 		bindToSpringApplication(environment);
+		//如果不是自定义的环境变量，若有必要则进行转换，一般都需要转换
 		if (!this.isCustomEnvironment) {
 			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment,
 					deduceEnvironmentClass());
@@ -487,20 +488,37 @@ public class SpringApplication {
 		}
 	}
 
+	/**
+	 * 用于准备容器上下文，主要是进行ApplicationContextInitializer扩展点的应用，以及打印启动日志，
+	 * 比如激活的profiles图，设置是否允许同名bean覆盖（默认不允许），是否懒加载（默认不允许）等操作。
+	 *
+	 * @param context              spring容器
+	 * @param environment          环境对象
+	 * @param listeners            监听器
+	 * @param applicationArguments 配置参数
+	 * @param printedBanner        banner
+	 */
 	private void prepareContext(ConfigurableApplicationContext context, ConfigurableEnvironment environment,
 								SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
 		//设置容器环境
 		context.setEnvironment(environment);
 		//执行容器后置处理
 		postProcessApplicationContext(context);
+		/*
+		 * 应用ApplicationContextInitializer扩展点的initialize方法
+		 * 从而实现自定义容器的逻辑，这是一个扩展点
+		 */
 		applyInitializers(context);
-		//向监听器发送容器已经准备好的上下文对象
+		//向监听器发送容器已经准备好的上下文对象,EventPublishingRunListener将会发出ApplicationContextInitializedEvent事件
 		listeners.contextPrepared(context);
+		//是否打印启动相关日志，默认true
 		if (this.logStartupInfo) {
+			//banner下的第一行日志
 			logStartupInfo(context.getParent() == null);
+			//记录激活的配置环境profiles日志信息
 			logStartupProfileInfo(context);
 		}
-		// Add boot specific singleton beans
+		// Add boot specific singleton beans 获取此上下文内部的beanFactory，即bean工厂
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
 		//将main函数中的args参数封装成单例bean对象
 		beanFactory.registerSingleton("springApplicationArguments", applicationArguments);
@@ -508,10 +526,14 @@ public class SpringApplication {
 			//printedBanner也封装成单例 注册进容器中
 			beanFactory.registerSingleton("springBootBanner", printedBanner);
 		}
+		//如果是该类型，servlet项目默认就是该类型
 		if (beanFactory instanceof DefaultListableBeanFactory) {
+			//设置是否允许同名bean的覆盖，这里默认false，如果有同名bean就会抛出异常
 			((DefaultListableBeanFactory) beanFactory)
 					.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
+		//设置是否允许懒加载，即延迟初始化bean，即仅在需要bean时才创建该bean，并注入其依赖项。
+		//默认false，即所有定义的bean及其依赖项都是在创建应用程序上下文时创建的。
 		if (this.lazyInitialization) {
 			context.addBeanFactoryPostProcessor(new LazyInitializationBeanFactoryPostProcessor());
 		}
@@ -613,6 +635,7 @@ public class SpringApplication {
 	 * @see #configurePropertySources(ConfigurableEnvironment, String[])
 	 */
 	protected void configureEnvironment(ConfigurableEnvironment environment, String[] args) {
+		//是否需要添加转换服务，默认需要
 		if (this.addConversionService) {
 			ConversionService conversionService = ApplicationConversionService.getSharedInstance();
 			environment.setConversionService((ConfigurableConversionService) conversionService);
@@ -694,6 +717,7 @@ public class SpringApplication {
 		ResourceLoader resourceLoader = (this.resourceLoader != null) ? this.resourceLoader
 				: new DefaultResourceLoader(getClassLoader());
 		SpringApplicationBannerPrinter bannerPrinter = new SpringApplicationBannerPrinter(resourceLoader, this.banner);
+		//banner输出到日志文件中还是控制台，默认是CONSOLE，即控制台
 		if (this.bannerMode == Mode.LOG) {
 			return bannerPrinter.print(environment, this.mainApplicationClass, logger);
 		}
@@ -710,9 +734,11 @@ public class SpringApplication {
 	 */
 	protected ConfigurableApplicationContext createApplicationContext() {
 		Class<?> contextClass = this.applicationContextClass;
+		//如果没有设置容器类型，根据web应用程序类型选择spring容器的类型
 		if (contextClass == null) {
 			try {
 				switch (this.webApplicationType) {
+					//一般都是servlet应用，因此spring容器就是AnnotationConfigServletWebServerApplicationContext类型
 					case SERVLET:
 						contextClass = Class.forName(DEFAULT_SERVLET_WEB_CONTEXT_CLASS);
 						break;

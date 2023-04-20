@@ -44,11 +44,13 @@ class SpringApplicationRunListeners {
 
 	void starting() {
 		for (SpringApplicationRunListener listener : this.listeners) {
+			//调用所有运行监听器的starting方法
 			listener.starting();
 		}
 	}
 
 	void environmentPrepared(ConfigurableEnvironment environment) {
+		//调用所有SpringApplicationRunListener的environmentPrepared方法
 		for (SpringApplicationRunListener listener : this.listeners) {
 			listener.environmentPrepared(environment);
 		}

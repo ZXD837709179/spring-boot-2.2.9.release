@@ -107,7 +107,7 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 
 	private static final String DEFAULT_PROPERTIES = "defaultProperties";
 
-	// Note the order is from least to most specific (last one wins)
+	// Note the order is from least to most specific (last one wins) 加载优先级和这里的顺序是相反的
 	private static final String DEFAULT_SEARCH_LOCATIONS = "classpath:/,classpath:/config/,file:./,file:./config/";
 
 	private static final String DEFAULT_NAMES = "application";
@@ -182,7 +182,9 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 	}
 
 	private void onApplicationEnvironmentPreparedEvent(ApplicationEnvironmentPreparedEvent event) {
+		//加载环境后处理器EnvironmentPostProcessor，很明显其也是从spring.factories文件中加载的
 		List<EnvironmentPostProcessor> postProcessors = loadPostProcessors();
+		//将自己页加入其中，因为ConfigFileApplicationListener本身也是一个EnvironmentPostProcessor
 		postProcessors.add(this);
 		AnnotationAwareOrderComparator.sort(postProcessors);
 		for (EnvironmentPostProcessor postProcessor : postProcessors) {
@@ -211,7 +213,9 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 	 * @see #addPostProcessors(ConfigurableApplicationContext)
 	 */
 	protected void addPropertySources(ConfigurableEnvironment environment, ResourceLoader resourceLoader) {
+		//随机数属性源加入到环境对象中
 		RandomValuePropertySource.addToEnvironment(environment);
+		//通过ConfigFileApplicationListener的内部类Loader来加载配置文件
 		new Loader(environment, resourceLoader).load();
 	}
 
