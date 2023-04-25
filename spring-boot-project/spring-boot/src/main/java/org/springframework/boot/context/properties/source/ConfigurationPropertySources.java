@@ -16,17 +16,12 @@
 
 package org.springframework.boot.context.properties.source;
 
+import org.springframework.core.env.*;
+import org.springframework.core.env.PropertySource.StubPropertySource;
+import org.springframework.util.Assert;
+
 import java.util.Collections;
 import java.util.stream.Stream;
-
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertySource;
-import org.springframework.core.env.PropertySource.StubPropertySource;
-import org.springframework.core.env.PropertySources;
-import org.springframework.core.env.PropertySourcesPropertyResolver;
-import org.springframework.util.Assert;
 
 /**
  * Provides access to {@link ConfigurationPropertySource ConfigurationPropertySources}.
@@ -48,6 +43,7 @@ public final class ConfigurationPropertySources {
 	 * Determines if the specific {@link PropertySource} is the
 	 * {@link ConfigurationPropertySource} that was {@link #attach(Environment) attached}
 	 * to the {@link Environment}.
+	 *
 	 * @param propertySource the property source to test
 	 * @return {@code true} if this is the attached {@link ConfigurationPropertySource}
 	 */
@@ -64,19 +60,24 @@ public final class ConfigurationPropertySources {
 	 * <p>
 	 * The attached resolver will dynamically track any additions or removals from the
 	 * underlying {@link Environment} property sources.
+	 *
 	 * @param environment the source environment (must be an instance of
-	 * {@link ConfigurableEnvironment})
+	 *                    {@link ConfigurableEnvironment})
 	 * @see #get(Environment)
 	 */
 	public static void attach(Environment environment) {
+		//https://juejin.cn/post/7083308838673186853
 		Assert.isInstanceOf(ConfigurableEnvironment.class, environment);
 		MutablePropertySources sources = ((ConfigurableEnvironment) environment).getPropertySources();
+		//这里会直接获取“configurationProperties”对应的变量信息，初次获取都会是null
 		PropertySource<?> attached = sources.get(ATTACHED_PROPERTY_SOURCE_NAME);
 		if (attached != null && attached.getSource() != sources) {
 			sources.remove(ATTACHED_PROPERTY_SOURCE_NAME);
 			attached = null;
 		}
 		if (attached == null) {
+			//新建一个ConfigurationPropertySourcesPropertySource类型的变量
+			//MutablePropertySources都转换成了ConfigurationPropertySourcesPropertySource的形式，类似与适配器
 			sources.addFirst(new ConfigurationPropertySourcesPropertySource(ATTACHED_PROPERTY_SOURCE_NAME,
 					new SpringConfigurationPropertySources(sources)));
 		}
@@ -85,11 +86,12 @@ public final class ConfigurationPropertySources {
 	/**
 	 * Return a set of {@link ConfigurationPropertySource} instances that have previously
 	 * been {@link #attach(Environment) attached} to the {@link Environment}.
+	 *
 	 * @param environment the source environment (must be an instance of
-	 * {@link ConfigurableEnvironment})
+	 *                    {@link ConfigurableEnvironment})
 	 * @return an iterable set of configuration property sources
 	 * @throws IllegalStateException if not configuration property sources have been
-	 * attached
+	 *                               attached
 	 */
 	public static Iterable<ConfigurationPropertySource> get(Environment environment) {
 		Assert.isInstanceOf(ConfigurableEnvironment.class, environment);
@@ -105,6 +107,7 @@ public final class ConfigurationPropertySources {
 	/**
 	 * Return {@link Iterable} containing a single new {@link ConfigurationPropertySource}
 	 * adapted from the given Spring {@link PropertySource}.
+	 *
 	 * @param source the Spring property source to adapt
 	 * @return an {@link Iterable} containing a single newly adapted
 	 * {@link SpringConfigurationPropertySource}
@@ -122,6 +125,7 @@ public final class ConfigurationPropertySources {
 	 * identified by changes in the sources returned by its iterator, will be
 	 * automatically tracked. The underlying source should be thread safe, for example a
 	 * {@link MutablePropertySources}
+	 *
 	 * @param sources the Spring property sources to adapt
 	 * @return an {@link Iterable} containing newly adapted
 	 * {@link SpringConfigurationPropertySource} instances

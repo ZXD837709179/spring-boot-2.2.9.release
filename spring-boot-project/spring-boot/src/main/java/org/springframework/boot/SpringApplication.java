@@ -462,7 +462,7 @@ public class SpringApplication {
 													   ApplicationArguments applicationArguments) {
 		// Create and configure the environment 创建并配置相应的环境 一般都是StandardServletEnvironment类型
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
-		//根据用户配置，配置environment系统环境，主要配置属性源和激活的环境，将来自外部的配置源放在属性源集合的头部
+		//根据用户配置，配置environment系统环境（test/prod），主要配置属性源和激活的环境，将来自外部的配置源放在属性源集合的头部
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
 		ConfigurationPropertySources.attach(environment);
 		//环境准备完毕之后,启动相应的监听器,向所有的ApplicationListener发出ApplicationEnvironmentPreparedEvent事件,其中一个重要的监听器是ConfigFileApplicationListener 就是加载项目配置文件的监听器；
@@ -473,6 +473,7 @@ public class SpringApplication {
 			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment,
 					deduceEnvironmentClass());
 		}
+		//调用监听器方法的时候，部分监听器会往环境中添加相应配置信息，为了保持configurationProperties配置数据的优先级，因此再次调用的attach
 		ConfigurationPropertySources.attach(environment);
 		return environment;
 	}
@@ -547,9 +548,13 @@ public class SpringApplication {
 	}
 
 	private void refreshContext(ConfigurableApplicationContext context) {
+		//刷新容器
 		refresh(context);
+		//判断是否注册销毁容器的钩子方法，默认true
 		if (this.registerShutdownHook) {
 			try {
+				//注册销毁容器时的钩子
+				//该方法向 JVM 运行时环境注册一个关闭钩子函数，在 JVM 关闭时会先关闭此上下文，即执行此上线文的close方法
 				context.registerShutdownHook();
 			} catch (AccessControlException ex) {
 				// Not allowed in some environments.
@@ -649,7 +654,7 @@ public class SpringApplication {
 	/**
 	 * Add, remove or re-order any {@link PropertySource}s in this application's
 	 * environment.
-	 *
+	 * 增加/移除/排序应用中的配置属性
 	 * @param environment this application's environment
 	 * @param args        arguments passed to the {@code run} method
 	 * @see #configureEnvironment(ConfigurableEnvironment, String[])
@@ -659,8 +664,10 @@ public class SpringApplication {
 		if (this.defaultProperties != null && !this.defaultProperties.isEmpty()) {
 			sources.addLast(new MapPropertySource("defaultProperties", this.defaultProperties));
 		}
+		//args不为空进去
 		if (this.addCommandLineProperties && args.length > 0) {
 			String name = CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME;
+			//封装args并替换里面的commandLineArgs属性
 			if (sources.contains(name)) {
 				PropertySource<?> source = sources.get(name);
 				CompositePropertySource composite = new CompositePropertySource(name);
@@ -669,6 +676,7 @@ public class SpringApplication {
 				composite.addPropertySource(source);
 				sources.replace(name, composite);
 			} else {
+				//封装args成为commandLineArgs属性
 				sources.addFirst(new SimpleCommandLinePropertySource(args));
 			}
 		}
@@ -957,10 +965,13 @@ public class SpringApplication {
 	}
 
 	private void callRunners(ApplicationContext context, ApplicationArguments args) {
+		//从容器中查找全部ApplicationRunner和CommandLineRunner类型的bean实例，并且加入到集合中
 		List<Object> runners = new ArrayList<>();
 		runners.addAll(context.getBeansOfType(ApplicationRunner.class).values());
 		runners.addAll(context.getBeansOfType(CommandLineRunner.class).values());
+		//排序
 		AnnotationAwareOrderComparator.sort(runners);
+		//依次运行这些bean文件
 		for (Object runner : new LinkedHashSet<>(runners)) {
 			if (runner instanceof ApplicationRunner) {
 				callRunner((ApplicationRunner) runner, args);

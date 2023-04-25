@@ -312,11 +312,13 @@ public class Binder {
 			boolean allowRecursiveBinding, boolean create) {
 		context.clearConfigurationProperty();
 		try {
+			//这里获取的replacementTarget其实就是SpringApplication
 			Bindable<T> replacementTarget = handler.onStart(name, target, context);
 			if (replacementTarget == null) {
 				return handleBindResult(name, target, handler, context, null, create);
 			}
 			target = replacementTarget;
+			//绑定处 - 绑定相应对象的属性信息和数据信息 初始化绑定Application时都会是null
 			Object bound = bindObject(name, target, handler, context, allowRecursiveBinding);
 			return handleBindResult(name, target, handler, context, bound, create);
 		}
@@ -502,7 +504,9 @@ public class Binder {
 	 * @since 2.2.0
 	 */
 	public static Binder get(Environment environment, BindHandler defaultBindHandler) {
+		//get这里，其实拿到的就是我们之前在attached部分的代码塞进的配置信息source.
 		Iterable<ConfigurationPropertySource> sources = ConfigurationPropertySources.get(environment);
+		//随后，根据环境会初始化相应的占位符解析器，会定义默认的占位符格式为"${}"
 		PropertySourcesPlaceholdersResolver placeholdersResolver = new PropertySourcesPlaceholdersResolver(environment);
 		return new Binder(sources, placeholdersResolver, null, null, defaultBindHandler);
 	}
