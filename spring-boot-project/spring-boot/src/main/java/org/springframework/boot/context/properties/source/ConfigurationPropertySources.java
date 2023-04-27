@@ -68,6 +68,7 @@ public final class ConfigurationPropertySources {
 	public static void attach(Environment environment) {
 		//https://juejin.cn/post/7083308838673186853
 		Assert.isInstanceOf(ConfigurableEnvironment.class, environment);
+		//sources是不同的数据源集合，里面是一些外部配置。'systemProperties'包含了spring.profiles.active的key,是从idea中加载得到的
 		MutablePropertySources sources = ((ConfigurableEnvironment) environment).getPropertySources();
 		//这里会直接获取“configurationProperties”对应的变量信息，初次获取都会是null
 		PropertySource<?> attached = sources.get(ATTACHED_PROPERTY_SOURCE_NAME);

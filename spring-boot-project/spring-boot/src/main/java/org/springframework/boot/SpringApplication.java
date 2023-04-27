@@ -460,7 +460,7 @@ public class SpringApplication {
 
 	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
 													   ApplicationArguments applicationArguments) {
-		// Create and configure the environment 创建并配置相应的环境 一般都是StandardServletEnvironment类型
+		// 创建并配置相应的环境 一般都是StandardServletEnvironment类型
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
 		//根据用户配置，配置environment系统环境（test/prod），主要配置属性源和激活的环境，将来自外部的配置源放在属性源集合的头部
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
@@ -619,6 +619,15 @@ public class SpringApplication {
 		}
 		switch (this.webApplicationType) {
 			case SERVLET:
+				/**
+				* 会因为父类构造方法AbstractEnvironment 调用customizePropertySources方法，创建数据源
+				 * 数据源的顺序
+				 * servletConfigInitParams
+				 * servletContextInitParams
+				 * jndiProperties
+				 * systemProperties
+				 * systemEnvironment
+				 */
 				return new StandardServletEnvironment();
 			case REACTIVE:
 				return new StandardReactiveWebEnvironment();
@@ -645,9 +654,9 @@ public class SpringApplication {
 			ConversionService conversionService = ApplicationConversionService.getSharedInstance();
 			environment.setConversionService((ConfigurableConversionService) conversionService);
 		}
-		//将main函数的args封装成SimpleCommandLinePropertySource,设置取test还是prod的配置文件
+		//将main函数的args封装成SimpleCommandLinePropertySource,args以--开头的参数与别的有点不同
 		configurePropertySources(environment, args);
-		//激活相应的配置文件
+		//激活相应的配置文件:设置取test还是prod的配置文件
 		configureProfiles(environment, args);
 	}
 
@@ -661,6 +670,7 @@ public class SpringApplication {
 	 */
 	protected void configurePropertySources(ConfigurableEnvironment environment, String[] args) {
 		MutablePropertySources sources = environment.getPropertySources();
+		//defaultProperties添加到数据源顺序的最后面
 		if (this.defaultProperties != null && !this.defaultProperties.isEmpty()) {
 			sources.addLast(new MapPropertySource("defaultProperties", this.defaultProperties));
 		}
@@ -676,7 +686,7 @@ public class SpringApplication {
 				composite.addPropertySource(source);
 				sources.replace(name, composite);
 			} else {
-				//封装args成为commandLineArgs属性
+				//封装args成为commandLineArgs属性，添加到顺序的最前面
 				sources.addFirst(new SimpleCommandLinePropertySource(args));
 			}
 		}

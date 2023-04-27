@@ -184,7 +184,7 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 	private void onApplicationEnvironmentPreparedEvent(ApplicationEnvironmentPreparedEvent event) {
 		//加载环境后处理器EnvironmentPostProcessor，很明显其也是从spring.factories文件中加载的
 		List<EnvironmentPostProcessor> postProcessors = loadPostProcessors();
-		//将自己页加入其中，因为ConfigFileApplicationListener本身也是一个EnvironmentPostProcessor
+		//将自己也加入其中，因为ConfigFileApplicationListener本身也是一个EnvironmentPostProcessor
 		postProcessors.add(this);
 		AnnotationAwareOrderComparator.sort(postProcessors);
 		for (EnvironmentPostProcessor postProcessor : postProcessors) {
