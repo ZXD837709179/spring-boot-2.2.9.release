@@ -3,9 +3,11 @@ package com.ke.mytest;
 import com.ke.mytest.service.anno.EnableHandle;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 
 @SpringBootApplication
 @EnableHandle
+@ServletComponentScan
 public class MytestApplication {
 	/**
 	 * 核心启动类  等同于

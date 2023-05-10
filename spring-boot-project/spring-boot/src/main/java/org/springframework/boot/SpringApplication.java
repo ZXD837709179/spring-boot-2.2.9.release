@@ -620,7 +620,7 @@ public class SpringApplication {
 		switch (this.webApplicationType) {
 			case SERVLET:
 				/**
-				* 会因为父类构造方法AbstractEnvironment 调用customizePropertySources方法，创建数据源
+				 * 会因为父类构造方法AbstractEnvironment 调用customizePropertySources方法，创建数据源
 				 * 数据源的顺序
 				 * servletConfigInitParams
 				 * servletContextInitParams
@@ -664,6 +664,7 @@ public class SpringApplication {
 	 * Add, remove or re-order any {@link PropertySource}s in this application's
 	 * environment.
 	 * 增加/移除/排序应用中的配置属性
+	 *
 	 * @param environment this application's environment
 	 * @param args        arguments passed to the {@code run} method
 	 * @see #configureEnvironment(ConfigurableEnvironment, String[])
@@ -867,18 +868,19 @@ public class SpringApplication {
 
 	/**
 	 * Load beans into the application context. 加载bean到上下文
+	 * spring容器在启动的时候，会将类解析成spring内部的 beanDefinition结构，并将其存储到
+	 * DefaultListableBeanFactory的map中
 	 *
 	 * @param context the context to load beans into
 	 * @param sources the sources to load
 	 *                <p>
-	 *                spring容器在启动的时候，会将类解析成spring内部的 beanDefinition结构，并将其存储到
-	 *                DefaultListableBeanFactory的map中
 	 */
 	protected void load(ApplicationContext context, Object[] sources) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Loading source " + StringUtils.arrayToCommaDelimitedString(sources));
 		}
 		//加载bean定义加载器  上下文->bean定义注册器->bean定义加载器
+		//spring容器在启动的时候，会将类解析成spring内部的beanDefinition中，并将beanDefinitionnc存储到DefaultListenableBeanFactory的map中
 		BeanDefinitionLoader loader = createBeanDefinitionLoader(getBeanDefinitionRegistry(context), sources);
 		if (this.beanNameGenerator != null) {
 			loader.setBeanNameGenerator(this.beanNameGenerator);
@@ -934,6 +936,7 @@ public class SpringApplication {
 	 * @return the BeanDefinitionRegistry if it can be determined
 	 */
 	private BeanDefinitionRegistry getBeanDefinitionRegistry(ApplicationContext context) {
+		//能进去，context类型是 org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext
 		if (context instanceof BeanDefinitionRegistry) {
 			return (BeanDefinitionRegistry) context;
 		}
