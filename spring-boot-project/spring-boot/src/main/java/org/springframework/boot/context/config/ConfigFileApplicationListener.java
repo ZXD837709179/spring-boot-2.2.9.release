@@ -303,17 +303,17 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 		private final PropertySourcesPlaceholdersResolver placeholdersResolver;
 
 		private final ResourceLoader resourceLoader;
-
+		//对于配置文件的解析类
 		private final List<PropertySourceLoader> propertySourceLoaders;
-
+		// 一个先进后出的队列，根据profile去解析指定的文件
 		private Deque<Profile> profiles;
-
+		// 已经处理的profile
 		private List<Profile> processedProfiles;
-
+		// 维护一个是否有在profiles中是否activeProfile的状态
 		private boolean activatedProfiles;
-
+		// 解析出来的数据都会以PropertySource的方式存到loaded中
 		private Map<Profile, MutablePropertySources> loaded;
-
+		//缓存作用
 		private Map<DocumentsCacheKey, List<Document>> loadDocumentsCache = new HashMap<>();
 
 		Loader(ConfigurableEnvironment environment, ResourceLoader resourceLoader) {
@@ -380,7 +380,7 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 			Set<Profile> profiles = getProfiles(binder, profilesProperty);
 			return new LinkedHashSet<>(profiles);
 		}
-
+		//environment的ActiveProfiles属性除了入参以外的所有配置文件
 		private List<Profile> getOtherActiveProfiles(Set<Profile> activatedViaProperty,
 				Set<Profile> includedViaProperty) {
 			return Arrays.stream(this.environment.getActiveProfiles()).map(Profile::new).filter(
@@ -463,7 +463,9 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 						+ "a directory, it must end in '/'");
 			}
 			Set<String> processed = new HashSet<>();
+			//加载propertyLoader或者yamlLoader
 			for (PropertySourceLoader loader : this.propertySourceLoaders) {
+				//property加载器加载xml或者property的结尾的文件
 				for (String fileExtension : loader.getFileExtensions()) {
 					if (processed.add(fileExtension)) {
 						loadForFileExtension(loader, location + name, "." + fileExtension, profile, filterFactory,
@@ -498,7 +500,7 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 			// Also try the profile-specific section (if any) of the normal file
 			load(loader, prefix + fileExtension, profile, profileFilter, consumer);
 		}
-
+		//真正加载配置文件内容的方法
 		private void load(PropertySourceLoader loader, String location, Profile profile, DocumentFilter filter,
 				DocumentConsumer consumer) {
 			try {
@@ -511,6 +513,7 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 					}
 					return;
 				}
+				//location -> classpath:/application.properties
 				if (!StringUtils.hasText(StringUtils.getFilenameExtension(resource.getFilename()))) {
 					if (this.logger.isTraceEnabled()) {
 						StringBuilder description = getDescription("Skipped empty config extension ", location,
@@ -625,7 +628,8 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 			}
 			this.environment.addActiveProfile(profile);
 		}
-
+		//spring.config.location可以设置配置文件路径，替换默认的路径
+		//spring.config.additional-location的路径不会替换默认路径
 		private Set<String> getSearchLocations() {
 			Set<String> locations = getSearchLocations(CONFIG_ADDITIONAL_LOCATION_PROPERTY);
 			if (this.environment.containsProperty(CONFIG_LOCATION_PROPERTY)) {
@@ -656,6 +660,7 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 			return locations;
 		}
 
+		//spring.config.name是配置文件的前缀名，可以指定前缀名
 		private Set<String> getSearchNames() {
 			if (this.environment.containsProperty(CONFIG_NAME_PROPERTY)) {
 				String property = this.environment.getProperty(CONFIG_NAME_PROPERTY);
@@ -664,6 +669,7 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 			return asResolvedSet(ConfigFileApplicationListener.this.names, DEFAULT_NAMES);
 		}
 
+		//取envionment中value的值，包括处理占位符，多个值是以逗号分隔
 		private Set<String> asResolvedSet(String value, String fallback) {
 			List<String> list = Arrays.asList(StringUtils.trimArrayElements(StringUtils.commaDelimitedListToStringArray(
 					(value != null) ? this.environment.resolvePlaceholders(value) : fallback)));
@@ -673,6 +679,7 @@ public class ConfigFileApplicationListener implements EnvironmentPostProcessor, 
 
 		private void addLoadedPropertySources() {
 			MutablePropertySources destination = this.environment.getPropertySources();
+			//配置文件内容
 			List<MutablePropertySources> loaded = new ArrayList<>(this.loaded.values());
 			Collections.reverse(loaded);
 			String lastAdded = null;

@@ -50,7 +50,7 @@ class FilteredPropertySource extends PropertySource<PropertySource<?>> {
 			Consumer<PropertySource<?>> operation) {
 		MutablePropertySources propertySources = environment.getPropertySources();
 		PropertySource<?> original = propertySources.get(propertySourceName);
-		if (original == null) {
+		if (original == null) { //进去
 			operation.accept(null);
 			return;
 		}

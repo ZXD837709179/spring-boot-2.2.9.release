@@ -705,6 +705,7 @@ public class SpringApplication {
 	 */
 	protected void configureProfiles(ConfigurableEnvironment environment, String[] args) {
 		Set<String> profiles = new LinkedHashSet<>(this.additionalProfiles);
+		//environment.getActiveProfiles()将propertySources中的属性放到profile中
 		profiles.addAll(Arrays.asList(environment.getActiveProfiles()));
 		environment.setActiveProfiles(StringUtils.toStringArray(profiles));
 	}
