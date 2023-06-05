@@ -1,0 +1,2 @@
+# ApplicationContextInitializer扩展的初始化类
+# org.springframework.context.ApplicationContextInitializer=com.ke.mytest.configuration.ApplicationContextInitializerExt
