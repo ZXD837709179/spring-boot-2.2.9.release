@@ -1,7 +1,9 @@
-package com.ke.mytest.configuration;
+package com.ke.mytest.ext;
 
+import com.ke.mytest.service.impl.ServiceAImpl;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
  * @author Zhang Xudong
@@ -14,6 +16,9 @@ public class ApplicationContextInitializerExt implements ApplicationContextIniti
 
 	@Override
 	public void initialize(ConfigurableApplicationContext applicationContext) {
-		System.out.println("#######   InitializerExt initialize        #######");
+		//设置激活文件是无效的 因为此时配置文件读取已经结束了 已经读取预先设置的配置文件和默认配置文件中的属性
+//		ConfigurableEnvironment environment = applicationContext.getEnvironment();
+//		environment.setActiveProfiles("test");
+		System.out.println("sout InitializerExt initialize ");
 	}
 }

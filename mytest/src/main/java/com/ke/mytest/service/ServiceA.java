@@ -14,7 +14,9 @@ public class ServiceA {
 	}
 
 	/**
+	 * PostConstruct是java下的包
 	 * PostConstruct所在的类 不需要注册成bean 只要实例化就会生成
+	 * ServiceAImpl是bean 子类实例化父类也会构造，就会调用ServiceA.postConstruct方法
 	 **/
 	@PostConstruct
 	public void postConstruct() {
