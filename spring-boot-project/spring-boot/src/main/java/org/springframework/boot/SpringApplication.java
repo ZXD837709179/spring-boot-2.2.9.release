@@ -547,6 +547,11 @@ public class SpringApplication {
 		listeners.contextLoaded(context);
 	}
 
+	/**
+	 * ApplicationContext和BeanFactory之间的关系有两种：组合、继承。
+	 * ApplicationContext继承beanfactory接口，又有属性beanfactory对象
+	 * @param context
+	 */
 	private void refreshContext(ConfigurableApplicationContext context) {
 		//刷新容器
 		refresh(context);
@@ -759,6 +764,7 @@ public class SpringApplication {
 			try {
 				switch (this.webApplicationType) {
 					//一般都是servlet应用，因此spring容器就是AnnotationConfigServletWebServerApplicationContext类型
+					//反射创建了AnnotationConfigServletWebServerApplicationContext对象，构造器做了一些特殊处理
 					case SERVLET:
 						contextClass = Class.forName(DEFAULT_SERVLET_WEB_CONTEXT_CLASS);
 						break;
@@ -881,7 +887,8 @@ public class SpringApplication {
 			logger.debug("Loading source " + StringUtils.arrayToCommaDelimitedString(sources));
 		}
 		//加载bean定义加载器  上下文->bean定义注册器->bean定义加载器
-		//spring容器在启动的时候，会将类解析成spring内部的beanDefinition中，并将beanDefinitionnc存储到DefaultListenableBeanFactory的map中
+		//spring容器在启动的时候，会将类解析成spring内部的beanDefinition中，并将beanDefinition存储到DefaultListenableBeanFactory的map中
+		//BeanDefinitionLoader定义了不同类型的加载器，扫描范围等
 		BeanDefinitionLoader loader = createBeanDefinitionLoader(getBeanDefinitionRegistry(context), sources);
 		if (this.beanNameGenerator != null) {
 			loader.setBeanNameGenerator(this.beanNameGenerator);
@@ -965,7 +972,7 @@ public class SpringApplication {
 	 */
 	protected void refresh(ApplicationContext applicationContext) {
 		Assert.isInstanceOf(AbstractApplicationContext.class, applicationContext);
-		//交由spring完成 boot任务完成了
+		//交由spring完成 boot任务完成了，onRefresh启动tomcat
 		((AbstractApplicationContext) applicationContext).refresh();
 	}
 

@@ -16,21 +16,15 @@
 
 package org.springframework.boot.web.servlet;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
 import javax.servlet.FilterRegistration.Dynamic;
 import javax.servlet.ServletContext;
-
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
+import java.util.*;
 
 /**
  * Abstract base {@link ServletContextInitializer} to register {@link Filter}s in a
@@ -205,6 +199,7 @@ public abstract class AbstractFilterRegistrationBean<T extends Filter> extends D
 	@Override
 	protected Dynamic addRegistration(String description, ServletContext servletContext) {
 		Filter filter = getFilter();
+		//将dispatcherservlet注册到servletcontext中
 		return servletContext.addFilter(getOrDeduceName(filter), filter);
 	}
 

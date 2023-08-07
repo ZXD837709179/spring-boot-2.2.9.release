@@ -16,12 +16,12 @@
 
 package org.springframework.boot.web.servlet;
 
+import org.springframework.web.SpringServletContainerInitializer;
+import org.springframework.web.WebApplicationInitializer;
+
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-
-import org.springframework.web.SpringServletContainerInitializer;
-import org.springframework.web.WebApplicationInitializer;
 
 /**
  * Interface used to configure a Servlet 3.0+ {@link ServletContext context}
@@ -50,6 +50,7 @@ public interface ServletContextInitializer {
 	 * @throws ServletException if any call against the given {@code ServletContext}
 	 * throws a {@code ServletException}
 	 */
+	 //servlet注册的起点
 	void onStartup(ServletContext servletContext) throws ServletException;
 
 }
