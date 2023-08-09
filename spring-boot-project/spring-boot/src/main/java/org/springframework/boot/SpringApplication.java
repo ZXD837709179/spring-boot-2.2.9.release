@@ -759,6 +759,7 @@ public class SpringApplication {
 			try {
 				switch (this.webApplicationType) {
 					//一般都是servlet应用，因此spring容器就是AnnotationConfigServletWebServerApplicationContext类型
+					//会把父类的GenericWebApplicationContext构造方法也执行，创建IOC容器
 					case SERVLET:
 						contextClass = Class.forName(DEFAULT_SERVLET_WEB_CONTEXT_CLASS);
 						break;

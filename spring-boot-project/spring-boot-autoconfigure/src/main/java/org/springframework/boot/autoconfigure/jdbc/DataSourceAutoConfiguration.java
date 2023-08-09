@@ -43,6 +43,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for {@link DataSource}.
+ * druid不讲武德配置@AutoConfigureBefore(DataSourceAutoConfiguration.class)，使这个配置不生效
  *
  * @author Dave Syer
  * @author Phillip Webb
@@ -51,14 +52,14 @@ import org.springframework.util.StringUtils;
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnClass({ DataSource.class, EmbeddedDatabaseType.class })
+@ConditionalOnClass({DataSource.class, EmbeddedDatabaseType.class})
 @EnableConfigurationProperties(DataSourceProperties.class)
-@Import({ DataSourcePoolMetadataProvidersConfiguration.class, DataSourceInitializationConfiguration.class })
+@Import({DataSourcePoolMetadataProvidersConfiguration.class, DataSourceInitializationConfiguration.class})
 public class DataSourceAutoConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
 	@Conditional(EmbeddedDatabaseCondition.class)
-	@ConditionalOnMissingBean({ DataSource.class, XADataSource.class })
+	@ConditionalOnMissingBean({DataSource.class, XADataSource.class})
 	@Import(EmbeddedDataSourceConfiguration.class)
 	protected static class EmbeddedDatabaseConfiguration {
 
@@ -66,10 +67,10 @@ public class DataSourceAutoConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
 	@Conditional(PooledDataSourceCondition.class)
-	@ConditionalOnMissingBean({ DataSource.class, XADataSource.class })
-	@Import({ DataSourceConfiguration.Hikari.class, DataSourceConfiguration.Tomcat.class,
+	@ConditionalOnMissingBean({DataSource.class, XADataSource.class})
+	@Import({DataSourceConfiguration.Hikari.class, DataSourceConfiguration.Tomcat.class,
 			DataSourceConfiguration.Dbcp2.class, DataSourceConfiguration.Generic.class,
-			DataSourceJmxConfiguration.class })
+			DataSourceJmxConfiguration.class})
 	protected static class PooledDataSourceConfiguration {
 
 	}
@@ -84,6 +85,7 @@ public class DataSourceAutoConfiguration {
 			super(ConfigurationPhase.PARSE_CONFIGURATION);
 		}
 
+		//设置数据库连接池的类型，例如spring.datasource.type=com.zaxxer.hikari.HikariDataSource
 		@ConditionalOnProperty(prefix = "spring.datasource", name = "type")
 		static class ExplicitType {
 
@@ -144,8 +146,7 @@ public class DataSourceAutoConfiguration {
 			if (environment.containsProperty(DATASOURCE_URL_PROPERTY)) {
 				try {
 					return StringUtils.hasText(environment.getProperty(DATASOURCE_URL_PROPERTY));
-				}
-				catch (IllegalArgumentException ex) {
+				} catch (IllegalArgumentException ex) {
 					// Ignore unresolvable placeholder errors
 				}
 			}

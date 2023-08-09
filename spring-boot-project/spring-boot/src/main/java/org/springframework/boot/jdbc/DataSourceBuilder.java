@@ -31,6 +31,7 @@ import org.springframework.boot.context.properties.source.MapConfigurationProper
 import org.springframework.util.ClassUtils;
 
 /**
+ * Hikari优先级最高
  * Convenience class for building a {@link DataSource} with common implementations and
  * properties. If HikariCP, Tomcat or Commons DBCP are on the classpath one of them will
  * be selected (in that order with Hikari first). In the interest of a uniform interface,
@@ -69,6 +70,7 @@ public final class DataSourceBuilder<T extends DataSource> {
 
 	@SuppressWarnings("unchecked")
 	public T build() {
+		//开始找type
 		Class<? extends DataSource> type = getType();
 		DataSource result = BeanUtils.instantiateClass(type);
 		maybeGetDriverClassName();
@@ -133,6 +135,7 @@ public final class DataSourceBuilder<T extends DataSource> {
 	}
 
 	private Class<? extends DataSource> getType() {
+		//type为空的话就找排在前面的一号备胎
 		Class<? extends DataSource> type = (this.type != null) ? this.type : findType(this.classLoader);
 		if (type != null) {
 			return type;

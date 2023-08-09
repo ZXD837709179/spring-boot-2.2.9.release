@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * Actual DataSource configurations imported by {@link DataSourceAutoConfiguration}.
+ * 根据配置文件的spring.datasource.type=xxx来选择具体的datasource
  *
  * @author Dave Syer
  * @author Phillip Webb
@@ -40,6 +41,7 @@ abstract class DataSourceConfiguration {
 
 	@SuppressWarnings("unchecked")
 	protected static <T> T createDataSource(DataSourceProperties properties, Class<? extends DataSource> type) {
+		//spring.datasource.type没有设置的话，每一个datasource都有可能走到这里，但是type为空
 		return (T) properties.initializeDataSourceBuilder().type(type).build();
 	}
 
@@ -76,11 +78,11 @@ abstract class DataSourceConfiguration {
 	@ConditionalOnClass(HikariDataSource.class)
 	@ConditionalOnMissingBean(DataSource.class)
 	@ConditionalOnProperty(name = "spring.datasource.type", havingValue = "com.zaxxer.hikari.HikariDataSource",
-			matchIfMissing = true)
+			matchIfMissing = true) //不配置也行
 	static class Hikari {
 
 		@Bean
-		@ConfigurationProperties(prefix = "spring.datasource.hikari")
+		@ConfigurationProperties(prefix = "spring.datasource.hikari") //默认情况下会初始化这个datasource,即使property并没有设置
 		HikariDataSource dataSource(DataSourceProperties properties) {
 			HikariDataSource dataSource = createDataSource(properties, HikariDataSource.class);
 			if (StringUtils.hasText(properties.getName())) {
@@ -111,6 +113,7 @@ abstract class DataSourceConfiguration {
 
 	/**
 	 * Generic DataSource configuration.
+	 * 自定义的数据库连接池
 	 */
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnMissingBean(DataSource.class)
