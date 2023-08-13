@@ -16,40 +16,29 @@
 
 package org.springframework.boot.autoconfigure.web.servlet;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletRegistration;
-
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionMessage;
+import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.condition.ConditionMessage.Style;
-import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type;
-import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
 import org.springframework.boot.autoconfigure.http.HttpProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ConditionContext;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.*;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.DispatcherServlet;
+
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletRegistration;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for the Spring
@@ -67,7 +56,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @ConditionalOnClass(DispatcherServlet.class)
-@AutoConfigureAfter(ServletWebServerFactoryAutoConfiguration.class)
+@AutoConfigureAfter(ServletWebServerFactoryAutoConfiguration.class) //在ServletWebServerFactoryAutoConfiguration之后自动配置
 public class DispatcherServletAutoConfiguration {
 
 	/*
@@ -83,10 +72,11 @@ public class DispatcherServletAutoConfiguration {
 	@Configuration(proxyBeanMethods = false)
 	@Conditional(DefaultDispatcherServletCondition.class)
 	@ConditionalOnClass(ServletRegistration.class)
+	//EnableConfigurationProperties注解的作用是将HttpProperties和WebMvcProperties注册到IOC容器中，
 	@EnableConfigurationProperties({ HttpProperties.class, WebMvcProperties.class })
 	protected static class DispatcherServletConfiguration {
 
-		@Bean(name = DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
+		@Bean(name = DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)//前端控制器
 		public DispatcherServlet dispatcherServlet(HttpProperties httpProperties, WebMvcProperties webMvcProperties) {
 			DispatcherServlet dispatcherServlet = new DispatcherServlet();
 			dispatcherServlet.setDispatchOptionsRequest(webMvcProperties.isDispatchOptionsRequest());
@@ -113,7 +103,7 @@ public class DispatcherServletAutoConfiguration {
 	@EnableConfigurationProperties(WebMvcProperties.class)
 	@Import(DispatcherServletConfiguration.class)
 	protected static class DispatcherServletRegistrationConfiguration {
-		//负责将dispatcherServlet注册到servletContext中
+		//负责将dispatcherServlet注册到servletContext中，上面创建了才会注册进去
 		@Bean(name = DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME)
 		@ConditionalOnBean(value = DispatcherServlet.class, name = DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
 		public DispatcherServletRegistrationBean dispatcherServletRegistration(DispatcherServlet dispatcherServlet,

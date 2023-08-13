@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+
+	<bean id="dog" class="com.ke.mytest.model.po.Dog">
+		<property name="color" value="yellow"/>
+		<property name="age" value="5"/>
+	</bean>
+
+	<bean id="teddy" class="com.ke.mytest.model.po.TeddyDog" parent="dog">
+		<property name="name" value="teddy"/>
+	</bean>
+
+</beans>
