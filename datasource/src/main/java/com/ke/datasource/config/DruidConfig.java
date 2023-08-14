@@ -12,10 +12,11 @@ import javax.sql.DataSource;
 public class DruidConfig {
 
 	@Bean
-	@ConfigurationProperties(prefix = "mydruid.config")
+	@ConfigurationProperties(prefix = "spring.datasource")
+	//对于druid数据库连接池，从spring.datasource.druid或者spring.datasource设置基础属性
 	public DataSource dataSource(){
 		/**
-		 * 配置这个之后，那么原先的可以直接生效的spring.datasource.druid下面的配置不会生效了，因为只会有一处的datasource生成
+		 * 配置成 mydruid.config的前缀后，那么原先的可以直接生效的spring.datasource.druid下面的配置不会生效了，因为只会有一处的datasource生成
 		 *       max-active: 10
 		 *       min-idle: 2
 		 *       不生效
