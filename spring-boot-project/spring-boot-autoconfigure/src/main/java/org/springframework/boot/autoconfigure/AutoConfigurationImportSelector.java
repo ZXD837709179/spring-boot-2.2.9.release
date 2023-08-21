@@ -114,7 +114,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		checkExcludedClasses(configurations, exclusions);
 		//2、移除要排除的配置类
 		configurations.removeAll(exclusions);
-		//3、过滤不用的配置类
+		//3、过滤不用的配置类,针对mybatis会加载MyBatisAutoConfiguration
 		configurations = filter(configurations, autoConfigurationMetadata);
 		//4、获取到需要装配的配置类后 触发AutoConfigurationImportEvent事件
 		//目的是告诉ConditionEvaluationReport评估报告器对象来记录符合条件的自动配置类
