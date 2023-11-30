@@ -149,16 +149,20 @@ public abstract class BaseExecutor implements Executor {
     List<E> list;
     try {
       queryStack++;
+		// 从一级缓存中获取缓存项
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
       if (list != null) {
+		  // 存储过程相关处理逻辑
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
+		  // 一级缓存未命中，则从数据库中查询
         list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
       }
     } finally {
       queryStack--;
     }
     if (queryStack == 0) {
+		// 从一级缓存中延迟加载嵌套查询结果
       for (DeferredLoad deferredLoad : deferredLoads) {
         deferredLoad.load();
       }
@@ -321,6 +325,7 @@ public abstract class BaseExecutor implements Executor {
 
   private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
     List<E> list;
+	//占位
     localCache.putObject(key, EXECUTION_PLACEHOLDER);
     try {
       list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);

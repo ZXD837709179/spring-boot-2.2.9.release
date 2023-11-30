@@ -28,6 +28,7 @@ public class InterceptorChain {
 
   public Object pluginAll(Object target) {
     for (Interceptor interceptor : interceptors) {
+		// 调用拦截器的 plugin 方法植入相应的插件逻辑
       target = interceptor.plugin(target);
     }
     return target;

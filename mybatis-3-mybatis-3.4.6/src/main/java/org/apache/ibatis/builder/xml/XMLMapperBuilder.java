@@ -88,12 +88,17 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   public void parse() {
+	  // 检测映射文件是否已经被解析过
     if (!configuration.isResourceLoaded(resource)) {
+		// 解析 mapper 节点
       configurationElement(parser.evalNode("/mapper"));
+		// 添加资源路径到“已解析资源集合”中
       configuration.addLoadedResource(resource);
+		// 通过命名空间绑定 Mapper 接口
       bindMapperForNamespace();
     }
 
+	// 处理未完成解析的节点
     parsePendingResultMaps();
     parsePendingCacheRefs();
     parsePendingStatements();
@@ -105,6 +110,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private void configurationElement(XNode context) {
     try {
+		//命名空间不能为空
       String namespace = context.getStringAttribute("namespace");
       if (namespace == null || namespace.equals("")) {
         throw new BuilderException("Mapper's namespace cannot be empty");
@@ -121,6 +127,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     }
   }
 
+  //解析SQL
   private void buildStatementFromContext(List<XNode> list) {
     if (configuration.getDatabaseId() != null) {
       buildStatementFromContext(list, configuration.getDatabaseId());
@@ -320,17 +327,22 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   private void sqlElement(List<XNode> list) throws Exception {
+	  //getDatabaseId不为null会调用两次，databaseId 用于标明数据库厂商的身份
     if (configuration.getDatabaseId() != null) {
       sqlElement(list, configuration.getDatabaseId());
     }
     sqlElement(list, null);
   }
 
+  //<sql>中的片段用来重复使用，可以在<sql>中定义一些sql片段，然后在其他地方使用<include refid="xxx"/>标签引用
   private void sqlElement(List<XNode> list, String requiredDatabaseId) throws Exception {
     for (XNode context : list) {
       String databaseId = context.getStringAttribute("databaseId");
+	  //id是对应起的名字
       String id = context.getStringAttribute("id");
+		// id = currentNamespace + "." + id
       id = builderAssistant.applyCurrentNamespace(id, false);
+	  //判断是否匹配
       if (databaseIdMatchesCurrent(id, databaseId, requiredDatabaseId)) {
         sqlFragments.put(id, context);
       }
@@ -339,14 +351,20 @@ public class XMLMapperBuilder extends BaseBuilder {
   
   private boolean databaseIdMatchesCurrent(String id, String databaseId, String requiredDatabaseId) {
     if (requiredDatabaseId != null) {
+		// 当前 databaseId 和目标 databaseId 不一致时，返回 false
       if (!requiredDatabaseId.equals(databaseId)) {
         return false;
       }
     } else {
+		//如果目标 databaseId 为空，但当前 databaseId 不为空。两者不一致，返回 false
       if (databaseId != null) {
         return false;
       }
       // skip this fragment if there is a previous one with a not null databaseId
+		/*
+		 * 如果当前 <sql> 节点的 id 与之前的 <sql> 节点重复，且先前节点
+		 * databaseId 不为空。则忽略当前节点，并返回 false
+		 */
       if (this.sqlFragments.containsKey(id)) {
         XNode context = this.sqlFragments.get(id);
         if (context.getStringAttribute("databaseId") != null) {

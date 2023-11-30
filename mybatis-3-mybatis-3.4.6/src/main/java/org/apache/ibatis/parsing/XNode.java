@@ -301,6 +301,7 @@ public class XNode {
     return children;
   }
 
+  //只取一层的key-value
   public Properties getChildrenAsProperties() {
     Properties properties = new Properties();
     for (XNode child : getChildren()) {

@@ -287,7 +287,7 @@ public final class MappedStatement {
   public String[] getResulSets() {
     return resultSets;
   }
-  
+  //parameterObject 为用户传入的实参
   public BoundSql getBoundSql(Object parameterObject) {
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();

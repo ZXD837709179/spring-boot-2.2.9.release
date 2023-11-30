@@ -17,7 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = MytestApplication.class)
 @RunWith(SpringRunner.class)
 @Slf4j
-public class ServiceTest {
+public class ServiceFrontMiddleBackQueue {
 	@Resource
 	FeignService feignService;
 
