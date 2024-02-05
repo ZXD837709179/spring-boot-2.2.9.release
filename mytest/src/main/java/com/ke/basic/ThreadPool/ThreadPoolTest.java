@@ -19,7 +19,7 @@ public class ThreadPoolTest {
 	 * 后续措施：尽量不要把线程池的核心线程数和最大线程数设置的一样，把阻塞队列的长度设置得大一些，至少保证阻塞队列本身的长度大于一次提交进来的任务数，
 	 * 而不要做出线程数加上队列长度才勉强容纳单批次任务数，这么极端的长度参数。
 	 */
-	private static final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(64, 64, 0, TimeUnit.MINUTES, new ArrayBlockingQueue<>(1));
+	private static final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(64, 64, 0, TimeUnit.MINUTES, new ArrayBlockingQueue<>(33));
 
 	@org.testng.annotations.Test
 	public void test1() {
@@ -28,7 +28,7 @@ public class ThreadPoolTest {
 			for (int j = 0; j < 34; j++) {
 				threadPoolExecutor.execute(() -> {
 					try {
-						Thread.sleep(1);
+						Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						throw new RuntimeException(e);
 					} finally {
