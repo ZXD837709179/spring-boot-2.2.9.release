@@ -1183,6 +1183,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         boolean completedAbruptly = true;
         try {
 			// 如果当前任务不为空，则直接执行；否则调用getTask()从任务队列中取出一个任务执行
+			// 这里就会让线程重复执行任务
             while (task != null || (task = getTask()) != null) {
                 w.lock();
                 // If pool is stopping, ensure thread is interrupted;
