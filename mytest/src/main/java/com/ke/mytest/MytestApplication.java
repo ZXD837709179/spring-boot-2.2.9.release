@@ -20,7 +20,7 @@ public class MytestApplication {
 	 * @Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
 	 */
 	public static void main(String[] args) {
-		//args = new String[]{"1","2","--name=shienchuang","--name=shizhenzhen","age=18","--developer.name=shirenchuang666"};
+//		args = new String[]{"1","2","--name=zhangsan","--name=lisi","age=18","--developer.name=shirenchuang666"};
 		SpringApplication.run(MytestApplication.class, args);
 	}
 

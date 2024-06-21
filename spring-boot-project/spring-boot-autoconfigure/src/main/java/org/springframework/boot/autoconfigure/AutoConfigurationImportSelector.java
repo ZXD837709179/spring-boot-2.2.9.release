@@ -56,6 +56,7 @@ import java.util.stream.Collectors;
  * @since 1.3.0
  */
 //AutoConfigurationImportSelector将所有符合条件的@configuration配置都加载到IOC容器中
+	//包括引入jar包，关键是DeferredImportSelector接口
 public class AutoConfigurationImportSelector implements DeferredImportSelector, BeanClassLoaderAware,
 		ResourceLoaderAware, BeanFactoryAware, EnvironmentAware, Ordered {
 
@@ -171,7 +172,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 * @return a list of candidate configurations
 	 */
 	protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
-		//怎么取的配置
+		//取的autoconfiguration对应的类名
 		List<String> configurations = SpringFactoriesLoader.loadFactoryNames(getSpringFactoriesLoaderFactoryClass(),
 				getBeanClassLoader());
 		Assert.notEmpty(configurations, "No auto configuration classes found in META-INF/spring.factories. If you "
@@ -407,7 +408,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 					() -> String.format("Only %s implementations are supported, got %s",
 							AutoConfigurationImportSelector.class.getSimpleName(),
 							deferredImportSelector.getClass().getName()));
-			//1、调用getAutoConfigurationEntry方法得到自动配置类放入autoConfigurationEntry对象中【核心】
+			//1、调用getAutoConfigurationEntry方法得到自动配置类放入autoConfigurationEntry对象中【核心】,具体有哪些来自spring.factory的配置
 			AutoConfigurationEntry autoConfigurationEntry = ((AutoConfigurationImportSelector) deferredImportSelector)
 					.getAutoConfigurationEntry(getAutoConfigurationMetadata(), annotationMetadata);
 			//2、将上一步获取到的entry对象放到autoConfigurationEntries集合中

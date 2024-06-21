@@ -65,6 +65,7 @@ public final class ConfigurationPropertySources {
 	 *                    {@link ConfigurableEnvironment})
 	 * @see #get(Environment)
 	 */
+	//将Environment中的PropertySources转换成ConfigurationPropertySourcesPropertySource
 	public static void attach(Environment environment) {
 		//https://juejin.cn/post/7083308838673186853
 		Assert.isInstanceOf(ConfigurableEnvironment.class, environment);

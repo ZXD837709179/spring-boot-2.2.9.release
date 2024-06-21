@@ -1,4 +1,4 @@
-package com.ke.leetcode.buySellStock;
+package com.ke.lt.buySellStock;
 
 /**
  * 多次买卖，买后一定要卖

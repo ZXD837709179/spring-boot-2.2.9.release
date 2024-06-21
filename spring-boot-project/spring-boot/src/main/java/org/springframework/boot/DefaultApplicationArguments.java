@@ -37,6 +37,14 @@ public class DefaultApplicationArguments implements ApplicationArguments {
 
 	private final String[] args;
 
+	public static void main(String[] args) {
+		args =new String[]{  "--name=Spring"};
+		DefaultApplicationArguments defaultApplicationArguments = new DefaultApplicationArguments(args);
+		//全部key
+		defaultApplicationArguments.getOptionNames();
+		//根据key获取value
+		defaultApplicationArguments.getOptionValues("key");
+	}
 	public DefaultApplicationArguments(String... args) {
 		Assert.notNull(args, "Args must not be null");
 		this.source = new Source(args);

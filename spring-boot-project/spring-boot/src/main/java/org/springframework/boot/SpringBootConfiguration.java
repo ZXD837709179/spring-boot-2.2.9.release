@@ -44,7 +44,7 @@ import org.springframework.core.annotation.AliasFor;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 
-@Configuration //标明该类未配置类
+@Configuration //标明该类为配置类
 public @interface SpringBootConfiguration {
 
 	/**

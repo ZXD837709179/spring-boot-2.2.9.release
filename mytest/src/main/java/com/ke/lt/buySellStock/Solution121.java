@@ -1,4 +1,4 @@
-package com.ke.leetcode.buySellStock;
+package com.ke.lt.buySellStock;
 
 /**
  * 只买一次，只卖一次

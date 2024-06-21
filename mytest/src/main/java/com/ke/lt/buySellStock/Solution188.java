@@ -1,4 +1,4 @@
-package com.ke.leetcode.buySellStock;
+package com.ke.lt.buySellStock;
 
 import java.util.stream.IntStream;
 

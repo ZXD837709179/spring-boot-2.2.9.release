@@ -1,4 +1,4 @@
-package com.ke.leetcode.stoneGame;
+package com.ke.lt.stoneGame;
 
 /**
  * https://leetcode.cn/problems/stone-game-iii/

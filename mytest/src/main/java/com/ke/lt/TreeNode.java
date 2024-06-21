@@ -1,10 +1,6 @@
-package com.ke.leetcode;
+package com.ke.lt;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import javax.annotation.security.DenyAll;
 
 /**
  * TODO Description

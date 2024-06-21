@@ -1,10 +1,6 @@
-package com.ke.leetcode.stoneGame;
-
-import com.ke.leetcode.TreeNode;
-import org.aspectj.weaver.ast.Var;
+package com.ke.lt.stoneGame;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * https://leetcode.cn/problems/stone-game-iv/description/

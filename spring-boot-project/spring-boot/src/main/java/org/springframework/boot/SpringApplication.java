@@ -508,6 +508,7 @@ public class SpringApplication {
 		/*
 		 * 应用ApplicationContextInitializer扩展点的initialize方法
 		 * 从而实现自定义容器的逻辑，这是一个扩展点
+		 * 这里的初始化器是new SpringApplication()创建的
 		 */
 		applyInitializers(context);
 		//向监听器发送容器已经准备好的上下文对象,EventPublishingRunListener将会发出ApplicationContextInitializedEvent事件
@@ -541,7 +542,7 @@ public class SpringApplication {
 		// Load the sources 主类 main方法所在的类
 		Set<Object> sources = getAllSources();
 		Assert.notEmpty(sources, "Sources must not be empty");
-		//加载我们的启动类 将启动类注入到容器中
+		//加载我们的启动类 将启动类注入到容器中，重点
 		load(context, sources.toArray(new Object[0]));
 		//发布容器已加载事件
 		listeners.contextLoaded(context);
@@ -775,6 +776,7 @@ public class SpringApplication {
 			}
 		}
 		//反射获取实例化对象
+		//创建AnnotationConfigServletWebServerApplicationContext的过程中会将IOC容器创建，GenericWebApplicationContext中DefaultListableBeanFactory
 		return (ConfigurableApplicationContext) BeanUtils.instantiateClass(contextClass);
 	}
 
@@ -801,7 +803,7 @@ public class SpringApplication {
 		}
 		//process
 		if (this.addConversionService) {
-			//beanfactory设置转换器
+			//beanfactory设置类型转换器，将一个类转成成另一个，例如String转Date
 			context.getBeanFactory().setConversionService(ApplicationConversionService.getSharedInstance());
 		}
 	}

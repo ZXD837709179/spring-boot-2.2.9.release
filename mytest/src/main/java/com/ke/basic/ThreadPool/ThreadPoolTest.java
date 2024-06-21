@@ -1,9 +1,7 @@
 package com.ke.basic.ThreadPool;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.*;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * https://www.cnblogs.com/thisiswhy/p/17994272
@@ -77,6 +75,54 @@ public class ThreadPoolTest {
 		System.out.println("线程数" + threadPoolExecutor2.getPoolSize());
 		System.out.println("队列数目" + threadPoolExecutor2.getQueue().size());
 
+
+	}
+
+	@org.testng.annotations.Test
+	public void test(){
+		//submit 可以提交runnable callable方法
+		//submit方法，实际上是将任务封装成一个FutureTask对象，然后使用execute方法将其提交给线程池。
+		//FutureTask.run方法中，如果Callable任务抛出异常，这个异常会被捕获并通过setException方法保存。这个异常不会导致执行任务的线程终止，因为异常被FutureTask内部处理了。
+		Executors.newFixedThreadPool(10).submit(()->{
+			System.out.println(1);
+			return null;
+		});
+
+		//execute 不可以提交callable方法，可以提交runnable
+		Executors.newFixedThreadPool(10).execute(()->{
+			System.out.println(2);
+		});
+	}
+
+
+
+	//DiscardPolicy的任务不会执行线程内部的逻辑，futureTask的get方法会一致阻塞
+	@org.testng.annotations.Test
+	public void test3() throws ExecutionException, InterruptedException {
+		// 一个核心线程，队列最大为1，最大线程数也是1.拒绝策略是DiscardPolicy
+		ThreadPoolExecutor executorService = new ThreadPoolExecutor(1, 1, 1L, TimeUnit.MINUTES,
+				new ArrayBlockingQueue<>(1), new ThreadPoolExecutor.DiscardPolicy());
+
+		Future f1 = executorService.submit(() -> {
+			System.out.println("提交任务1");
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
+
+		Future f2 = executorService.submit(() -> {
+			System.out.println("提交任务2");
+		});
+
+		Future f3 = executorService.submit(() -> {
+			System.out.println("提交任务3");
+		});
+
+		System.out.println("任务1完成 " + f1.get());// 等待任务1执行完毕
+		System.out.println("任务2完成" + f2.get());// 等待任务2执行完毕
+		System.out.println("任务3完成" + f3.get());// 等待任务3执行完毕
 
 	}
 

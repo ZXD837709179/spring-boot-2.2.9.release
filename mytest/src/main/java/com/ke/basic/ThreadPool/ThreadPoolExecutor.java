@@ -1043,19 +1043,22 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         final ReentrantLock mainLock = this.mainLock;
         mainLock.lock();
         try {
+			// 更新完成的任务计数
             completedTaskCount += w.completedTasks;
+			// 从工作集中移除这个工作线程
             workers.remove(w);
         } finally {
             mainLock.unlock();
         }
-		// 尝试结束线程池
+		// 尝试终止线程池或调整线程池大小；
+		// 查是否所有任务都已完成，并且线程池是否应该转移到终止状态。这通常发生在调用了shutdown()或shutdownNow()之后。
         tryTerminate();
 
         int c = ctl.get();
 		// 如果是RUNNING 或 SHUTDOWN状态
         if (runStateLessThan(c, STOP)) {
-			// worker是正常执行完
             if (!completedAbruptly) {
+				// worker是正常执行完
 				// 如果允许核心线程超时则最小线程数是0，否则最小线程数等于核心线程数
 				int min = allowCoreThreadTimeOut ? 0 : corePoolSize;
 				// 如果阻塞队列非空，则至少要有一个线程继续执行剩下的任务
@@ -1065,6 +1068,8 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
                 if (workerCountOf(c) >= min)
                     return; // replacement not needed
             }
+			//如果之前的线程中断了，那么会立即创建一个替换；
+			//也就是说如果线程内部抛出了异常，那么会创建一个新的替换之前的线程
             addWorker(null, false);
         }
     }
